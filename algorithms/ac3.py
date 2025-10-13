@@ -1,28 +1,70 @@
 from collections import deque
+from utils import target_cols_from_pos
 
 def ac3(target_pos, n):
-    domains = {i: set(range(n)) for i in range(n)}
-    arcs = deque([(i, j) for i in range(n) for j in range(n) if i != j])
-    steps = [dict(domains)]
+    target = target_cols_from_pos(target_pos)
+
+    domains = {i: set() for i in range(n)}
+    for r in range(n):
+        t = target[r]
+        dom = {t}
+        dom.add((t - 1) % n)
+        dom.add((t + 1) % n)
+        domains[r] = dom
+
+    arcs = deque((i, j) for i in range(n) for j in range(n) if i != j)
+
+    def revise(domains, xi, xj):
+        removed = False
+        to_remove = set()
+        for x in domains[xi]:
+            if all(y == x for y in domains[xj]):
+                to_remove.add(x)
+        if to_remove:
+            domains[xi] -= to_remove
+            removed = True
+        return removed
 
     while arcs:
-        (xi, xj) = arcs.popleft()
+        xi, xj = arcs.popleft()
         if revise(domains, xi, xj):
-            steps.append(dict(domains))
             if not domains[xi]:
-                return steps
+                return []
             for xk in range(n):
                 if xk != xi and xk != xj:
                     arcs.append((xk, xi))
-    return steps
 
-def revise(domains, xi, xj):
-    revised = False
-    remove_vals = set()
-    for x in domains[xi]:
-        if all(x == y for y in domains[xj]):  # tất cả giá trị của xj đều trùng x
-            remove_vals.add(x)
-    if remove_vals:
-        domains[xi] -= remove_vals
-        revised = True
-    return revised
+    assigned = {}
+    used_cols = set()
+    order = sorted(range(n), key=lambda r: (len(domains[r]), r))  # MRV
+
+    path = []
+    for r in order:
+        candidates = []
+        t = target[r]
+        if t in domains[r]:
+            candidates.append(t)
+        others = sorted([v for v in domains[r] if v != t], key=lambda v: min((v - t) % n, (t - v) % n))
+        candidates.extend(others)
+
+        chosen = None
+        for v in candidates:
+            if v not in used_cols:
+                chosen = v
+                break
+        if chosen is None:
+            return []
+
+        assigned[r] = chosen
+        used_cols.add(chosen)
+
+        max_row = max(assigned.keys())
+        state = tuple(assigned[i] for i in range(max_row + 1))
+        path.append(state)
+
+    final = [None] * n
+    for r, v in assigned.items():
+        final[r] = v
+    path[-1] = tuple(final)  
+
+    return path
