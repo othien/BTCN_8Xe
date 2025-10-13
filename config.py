@@ -1,0 +1,15 @@
+N = 8
+K = 8
+# kick thuoc o
+CELL = 48
+
+STEP_DELAY = 120
+
+LIMIT = 8
+ROOK_TEXT = "♖"
+FONT_NAME = "Segoe UI Emoji"
+
+LOG_PANEL_WIDTH = 380
+LOG_PANEL_HEIGHT = N * CELL
+
+LOG_MAX_LINES = 2000
