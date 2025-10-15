@@ -1,4 +1,6 @@
 # BTCN_8Xe
+https://github.com/othien/BTCN_8Xe.git
+
 Báo cáo đồ án cá nhân trí tuệ nhân tạo
 Đề tài: Giải bài toán đặt 8 quân xe lên bàn cờ với điều kiện chúng không ăn lẫn nhau bằng các thuật toán tìm kiếm
 
